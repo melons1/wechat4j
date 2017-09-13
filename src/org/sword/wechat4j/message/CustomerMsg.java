@@ -55,20 +55,21 @@ public class CustomerMsg {
 	 * 发送客服消息
 	 * @param msgBody
 	 */
-	private void send(){
+	private String send(){
 		String accessToken = TokenProxy.accessToken();
 		if(StringUtils.isBlank(this.toUserOpenId))
-			return;
+			return "";
 		//token不存在则重新刷新token
 		if(StringUtils.isBlank(accessToken)){
 			logger.error("发送失败，无法得到accessToken");
-			return;
+			return "";
 		}
 		//需要判断一下，防止上面刷新token失败
 		if(StringUtils.isNotBlank(accessToken)){
 			String url = MSG_URL + accessToken;
-			HttpUtils.post(url, msgBody);
+			return HttpUtils.post(url, msgBody);
 		}
+		return "";
 	}
 
 	/**
@@ -82,7 +83,7 @@ public class CustomerMsg {
 }
 	 * @param content
 	 */
-	public void sendText(String content){
+	public String sendText(String content){
 		this.msgType = MsgType.text.name();
 		
 		JSONObject jsonMsg = new JSONObject();
@@ -94,7 +95,7 @@ public class CustomerMsg {
 		json.put("text", jsonMsg);
 		
 		this.msgBody = json.toJSONString();
-		send();
+		return send();
 	}
 	
 	/**
@@ -109,7 +110,7 @@ public class CustomerMsg {
 }
 	 * @param mediaId
 	 */
-	public void sendImage(String mediaId){
+	public String sendImage(String mediaId){
 		this.msgType = MsgType.image.name();
 
 		JSONObject jsonMsg = new JSONObject();
@@ -122,7 +123,7 @@ public class CustomerMsg {
 
 		this.msgBody =  json.toJSONString();
 		
-		send();
+		return send();
 	}
 	
 	/**
@@ -137,7 +138,7 @@ public class CustomerMsg {
     }
 }
 	 */
-	public void sendVoice(String mediaId){
+	public String sendVoice(String mediaId){
 		this.msgType = MsgType.voice.name();
 		
 		JSONObject jsonMsg = new JSONObject();
@@ -149,7 +150,7 @@ public class CustomerMsg {
 		json.put("voice", jsonMsg);
 		
 		this.msgBody = json.toJSONString();
-		send();
+		return send();
 	}
 	
 	/**
@@ -161,13 +162,13 @@ public class CustomerMsg {
 	 * @param mediaId
 	 * @param thumbMediaId
 	 */
-	public void sendVideo(String title,String description,String mediaId,String thumbMediaId){
+	public String sendVideo(String title,String description,String mediaId,String thumbMediaId){
 		VideoResponse video = new VideoResponse();
 		video.setTitle(title);
 		video.setDescription(description);
 		video.setMediaId(thumbMediaId);
 		video.setThumbMediaId(thumbMediaId);
-		sendVideo(video);
+		return sendVideo(video);
 	}
 	
 	/**
@@ -185,7 +186,7 @@ public class CustomerMsg {
 }
 	 * @param video
 	 */
-	public void sendVideo(VideoResponse video){
+	public String sendVideo(VideoResponse video){
 		this.msgType = MsgType.video.name();
 		
 		JSONObject jsonMsg = new JSONObject();
@@ -200,7 +201,7 @@ public class CustomerMsg {
 		json.put("video", jsonMsg);
 		
 		this.msgBody = json.toJSONString();
-		send();
+		return send();
 	}
 	
 	/**
@@ -211,14 +212,14 @@ public class CustomerMsg {
 	 * @param hQMusicUrl
 	 * @param thumbMediaId
 	 */
-	public void sendMusic(String title,String description,String musicURL,String hQMusicUrl,String thumbMediaId){
+	public String sendMusic(String title,String description,String musicURL,String hQMusicUrl,String thumbMediaId){
 		MusicResponse music = new MusicResponse();
 		music.setTitle(title);
 		music.setDescription(description);
 		music.setMusicURL(musicURL);
 		music.setHQMusicUrl(hQMusicUrl);
 		music.setThumbMediaId(thumbMediaId);
-		sendMusic(music);
+		return sendMusic(music);
 	}
 	
 	/**
@@ -237,7 +238,7 @@ public class CustomerMsg {
 }
 	 * @param music  音乐消息
 	 */
-	public void sendMusic(MusicResponse music){
+	public String sendMusic(MusicResponse music){
 		this.msgType = MsgType.music.name();
 		
 		JSONObject jsonMsg = new JSONObject();
@@ -253,7 +254,7 @@ public class CustomerMsg {
 		json.put("music", jsonMsg);
 		
 		this.msgBody = json.toJSONString();
-		send();
+		return send();
 	}
 	
 	/**
@@ -263,23 +264,23 @@ public class CustomerMsg {
 	 * @param PicUrl        图片链接，支持JPG、PNG格式，较好的效果为大图360*200，小图200*200
 	 * @param Url           点击图文消息跳转链接
 	 */
-	public void sendNew(String title,String description,String picUrl,String url){
+	public String sendNew(String title,String description,String picUrl,String url){
 		ArticleResponse item = new ArticleResponse();
 		item.setTitle(title);
 		item.setDescription(description);
 		item.setPicUrl(picUrl);
 		item.setUrl(url);
-		sendNews(item);
+		return sendNews(item);
 	}
 	
 	/**
 	 * 发送图文消息，单条图文消息
 	 * @param item
 	 */
-	public void sendNews(ArticleResponse item){
+	public String sendNews(ArticleResponse item){
 		List<ArticleResponse> items = new ArrayList<ArticleResponse>();
 		items.add(item);
-		sendNews(items);
+		return sendNews(items);
 	}
 	
 	/**
@@ -306,7 +307,7 @@ public class CustomerMsg {
 }
 	 * @param items
 	 */
-	public void sendNews(List<ArticleResponse> items){
+	public String sendNews(List<ArticleResponse> items){
 		this.msgType = MsgType.news.name();
 		JSONArray jsonArray = new JSONArray();
 		for (ArticleResponse item : items) {
@@ -328,7 +329,7 @@ public class CustomerMsg {
 		json.put("news", jsonMsg);
 		
 		this.msgBody = json.toJSONString();
-		send();
+		return send();
 		
 	}
 	
